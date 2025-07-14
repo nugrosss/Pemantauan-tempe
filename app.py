@@ -9,9 +9,9 @@ data_sensor = {
     "kelembaban": 0
 }
 
-# Inisialisasi kamera
-cap = cv2.VideoCapture(0)  # 0 = kamera default (ubah ke 1 jika pakai USB eksternal)
+cap = cv2.VideoCapture(0)  # Ganti ke 1 jika pakai kamera USB eksternal
 model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
+
 if not cap.isOpened():
     print("Kamera tidak terdeteksi.")
 else:
@@ -24,8 +24,31 @@ def generate_frames():
             print("⚠️ Gagal membaca frame dari kamera.")
             break
         else:
+            # Jalankan deteksi dengan YOLO
+            results = model.predict(frame, verbose=False)
+
+            # Ambil hasil deteksi dari frame
+            for r in results:
+                boxes = r.boxes
+                for box in boxes:
+                    # Koordinat bounding box
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])
+
+                    # Skor dan label
+                    conf = box.conf[0]
+                    cls_id = int(box.cls[0])
+                    label = model.names[cls_id]
+
+                    # Gambar bounding box dan label di frame
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+            # Encode frame ke JPEG
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
+
+            # Kirim frame sebagai stream
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
