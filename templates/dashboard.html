@@ -14,27 +14,22 @@
   <div class="dashboard-container">
     <div class="sidebar">
       <div class="box">
-      <p>Suhu: <span id="suhu">{{ data.suhu }}</span> °C</p>
-    </div>
-    <div class="box">
-      <p>Kelembaban: <span id="kelembaban">{{ data.kelembaban }}</span> %</p>
-    </div>
-
-      
+        <p>Suhu: <span id="suhu">{{ data.suhu }}</span> °C</p>
+      </div>
+      <div class="box">
+        <p>Kelembaban: <span id="kelembaban">{{ data.kelembaban }}</span> %</p>
+      </div>
+      <div class="box">
+        <button onclick="logout()">Logout</button>
+      </div>
     </div>
 
     <div class="main-content">
-      
-        <!-- <div class="image-box">
-        <p>Foto Kamera (terbaru):</p>
-        <img id="live-image" src="getimage.php" alt="Live Image" style="max-width:100%; border: 1px solid #ccc; border-radius: 8px;">
-      </div> -->
-      <h1>live tempe</h1>
-      <img src="{{ url_for('video_feed') }}" width="640" height="480" />
-
+      <h1>Hasil Deteksi</h1>
+      <img id="deteksi" src="/latest_image" width="640" alt="Deteksi Kamera" style="border:1px solid #ccc; border-radius: 8px;">
     </div>
   </div>
-    <!-- <meta http-equiv="refresh" content="1">  -->
+
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

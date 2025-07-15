@@ -1,4 +1,3 @@
-
 const users = [
   { username: "admin", password: "1234" },
   { username: "user", password: "abcd" }
@@ -14,10 +13,7 @@ function login() {
   );
 
   if (user) {
-    // Simpan status login di localStorage
     localStorage.setItem("loggedIn", "true");
-    
-    // Redirect ke route Flask, bukan file HTML langsung!
     window.location.href = "/dashboard";
   } else {
     errorMessage.textContent = "Username atau password salah.";
@@ -29,7 +25,6 @@ function logout() {
   window.location.href = "/";
 }
 
-
 function updateSensorData() {
   fetch('/sensor-data')
     .then(response => response.json())
@@ -40,8 +35,16 @@ function updateSensorData() {
     .catch(error => console.error('Gagal ambil data:', error));
 }
 
-// Jalankan saat halaman selesai dimuat
+function updateDetectionImage() {
+  const img = document.getElementById('deteksi');
+  if (img) {
+    const timestamp = new Date().getTime();
+    img.src = `/latest_image?t=${timestamp}`;
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  updateSensorData(); // Panggil langsung pertama kali
-  setInterval(updateSensorData, 1000); // Update setiap 1 detik
+  updateSensorData();
+  setInterval(updateSensorData, 1000);
+  setInterval(updateDetectionImage, 500);
 });
