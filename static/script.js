@@ -32,7 +32,7 @@ function updateSensorData() {
       document.getElementById('suhu').textContent = data.suhu;
       document.getElementById('kelembaban').textContent = data.kelembaban;
     })
-    .catch(error => console.error('Gagal ambil data:', error));
+    .catch(error => console.error('Gagal ambil data sensor:', error));
 }
 
 function updateDetectionImage() {
@@ -42,6 +42,7 @@ function updateDetectionImage() {
     img.src = `/latest_image?t=${timestamp}`;
   }
 }
+
 function updateTempeCount() {
   fetch('/tempe-count')
     .then(response => response.json())
@@ -52,13 +53,13 @@ function updateTempeCount() {
     .catch(error => console.error('Gagal ambil data tempe:', error));
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
   updateSensorData();
   setInterval(updateSensorData, 1000);
-  
-  updateTempeCount();
-  setInterval(updateTempeCount, 1000);
 
   updateDetectionImage();
+  setInterval(updateDetectionImage, 500);
+
+  updateTempeCount();
+  setInterval(updateTempeCount, 1000);  // ← Tambahkan baris ini
 });
