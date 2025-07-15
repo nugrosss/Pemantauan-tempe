@@ -11,8 +11,8 @@ data_sensor = {
 }
 
 tempe_count = {
-    "bagus": 0,
-    "jelek": 0
+    "Tempe bagus": 0,
+    "Tempe jelek": 0
 }
 
 cap = cv2.VideoCapture(0)
@@ -29,18 +29,18 @@ def generate_frames():
         results = model.predict(frame, verbose=False)
 
         # Reset jumlah tempe
-        tempe_count["bagus"] = 0
-        tempe_count["jelek"] = 0
+        tempe_count["Tempe bagus"] = 0
+        tempe_count["Tempe jelek"] = 0
 
         for r in results:
             for box in r.boxes:
                 cls_id = int(box.cls[0])
                 label = model.names[cls_id].lower()
 
-                if "bagus" in label:
-                    tempe_count["bagus"] += 1
-                elif "jelek" in label:
-                    tempe_count["jelek"] += 1
+                if "Tempe bagus" in label:
+                    tempe_count["Tempe bagus"] += 1
+                elif "Tempe jelek" in label:
+                    tempe_count["Tempe jelek"] += 1
 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 conf = box.conf[0]
