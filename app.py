@@ -1,13 +1,10 @@
-from flask import Flask, request, render_template ,jsonify,Response , send_file
+from flask import Flask, render_template, Response, jsonify, request
 import cv2
-from ultralytics import YOLO 
+from ultralytics import YOLO
 import time
-from threading import Thread
-import io
-from PIL import Image
-
 
 app = Flask(__name__)
+
 data_sensor = {
     "suhu": 0,
     "kelembaban": 0
@@ -18,23 +15,20 @@ tempe_count = {
     "jelek": 0
 }
 
-
 cap = cv2.VideoCapture(0)
 model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
 
-latest_frame = None  # Variabel global untuk menyimpan gambar terbaru
-
-def capture_and_detect():
-    global latest_frame, tempe_count
+def generate_frames():
+    global tempe_count
     while True:
         success, frame = cap.read()
         if not success:
-            time.sleep(0.5)
-            continue
+            print("❌ Gagal membaca kamera")
+            break
 
         results = model.predict(frame, verbose=False)
-        
-        # Reset jumlah tempe setiap loop
+
+        # Reset jumlah tempe
         tempe_count["bagus"] = 0
         tempe_count["jelek"] = 0
 
@@ -54,34 +48,13 @@ def capture_and_detect():
                 cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-        _, buffer = cv2.imencode('.jpg', frame)
-        latest_frame = buffer.tobytes()
-        time.sleep(0.25)
+        # Encode ke JPEG
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
 
-# Jalankan thread terpisah untuk loop kamera
-Thread(target=capture_and_detect, daemon=True).start()
-
-@app.route('/')
-def index():
-    return render_template('image_view.html')
-
-@app.route('/latest_image')
-def latest_image():
-    global latest_frame
-    if latest_frame:
-        return Response(latest_frame, mimetype='image/jpeg')
-    else:
-        return "Belum ada gambar", 503
-    
-    
-@app.route('/tempe-count')
-def get_tempe_count():
-    return jsonify(tempe_count)
-
-
-@app.route('/sensor-data')
-def sensor_data():
-    return jsonify(data_sensor)
+        # Streaming ke browser
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/')
 def home():
@@ -91,12 +64,23 @@ def home():
 def dashboard():
     return render_template('dashboard.html', data=data_sensor)
 
-# 🟢 Tambahkan decorator ini agar bisa diakses dari ESP32
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/sensor-data')
+def sensor_data():
+    return jsonify(data_sensor)
+
+@app.route('/tempe-count')
+def get_tempe_count():
+    return jsonify(tempe_count)
+
 @app.route('/update')
 def update_data():
     suhu = request.args.get('suhu')
     kelembaban = request.args.get('kelembaban')
-    
+
     if suhu and kelembaban:
         data_sensor['suhu'] = suhu
         data_sensor['kelembaban'] = kelembaban
@@ -105,4 +89,4 @@ def update_data():
     return "Data tidak lengkap"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True,use_reloader=False)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
