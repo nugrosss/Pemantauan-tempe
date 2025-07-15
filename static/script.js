@@ -42,9 +42,23 @@ function updateDetectionImage() {
     img.src = `/latest_image?t=${timestamp}`;
   }
 }
+function updateTempeCount() {
+  fetch('/tempe-count')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('bagus').textContent = data.bagus;
+      document.getElementById('jelek').textContent = data.jelek;
+    })
+    .catch(error => console.error('Gagal ambil data tempe:', error));
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
   updateSensorData();
   setInterval(updateSensorData, 1000);
-  setInterval(updateDetectionImage, 500);
+  
+  updateTempeCount();
+  setInterval(updateTempeCount, 1000);
+
+  updateDetectionImage();
 });

@@ -13,40 +13,50 @@ data_sensor = {
     "kelembaban": 0
 }
 
+tempe_count = {
+    "bagus": 0,
+    "jelek": 0
+}
+
+
 cap = cv2.VideoCapture(0)
 model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
 
 latest_frame = None  # Variabel global untuk menyimpan gambar terbaru
 
 def capture_and_detect():
-    global latest_frame
+    global latest_frame, tempe_count
     while True:
         success, frame = cap.read()
         if not success:
-            print("⚠️ Gagal membaca frame dari kamera.")
             time.sleep(0.5)
             continue
 
-        # Jalankan YOLO
         results = model.predict(frame, verbose=False)
+        
+        # Reset jumlah tempe setiap loop
+        tempe_count["bagus"] = 0
+        tempe_count["jelek"] = 0
 
         for r in results:
-            boxes = r.boxes
-            for box in boxes:
+            for box in r.boxes:
+                cls_id = int(box.cls[0])
+                label = model.names[cls_id].lower()
+
+                if "bagus" in label:
+                    tempe_count["bagus"] += 1
+                elif "jelek" in label:
+                    tempe_count["jelek"] += 1
+
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 conf = box.conf[0]
-                cls_id = int(box.cls[0])
-                label = model.names[cls_id]
-
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-        # Simpan frame sebagai image ke memori
         _, buffer = cv2.imencode('.jpg', frame)
         latest_frame = buffer.tobytes()
-
-        time.sleep(0.5)  # Ambil foto setiap 500ms
+        time.sleep(0.25)
 
 # Jalankan thread terpisah untuk loop kamera
 Thread(target=capture_and_detect, daemon=True).start()
@@ -62,6 +72,11 @@ def latest_image():
         return Response(latest_frame, mimetype='image/jpeg')
     else:
         return "Belum ada gambar", 503
+    
+    
+@app.route('/tempe-count')
+def get_tempe_count():
+    return jsonify(tempe_count)
 
 
 @app.route('/sensor-data')
