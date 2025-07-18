@@ -69,14 +69,3 @@ cap.release()
 cv2.destroyAllWindows()
 
 
-[Unit]
-Description=Shutdown Button Service
-After=multi-user.target
-
-[Service]
-ExecStart=/usr/bin/python3 /home/pi/shutdown_button.py
-Restart=always
-User=pi
-
-[Install]
-WantedBy=multi-user.target
