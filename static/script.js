@@ -21,7 +21,7 @@ function login() {
 }
 
 function history() {
-  localStorage.removeItem("loggedIn");
+  // localStorage.removeItem("loggedIn");
   window.location.href = "/history";
 }
 

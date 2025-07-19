@@ -107,6 +107,15 @@ def home():
 def dashboard():
     return render_template('dashboard.html', data=data_sensor)
 
+@app.route('/history')
+def history():
+    image_folder = 'static/history'
+    images = []
+    if os.path.exists(image_folder):
+        images = os.listdir(image_folder)
+        images.sort(reverse=True)  # Supaya terbaru tampil dulu
+    return render_template('history.html', images=images)
+
 
 @app.route('/sensor-data')
 def sensor_data():
