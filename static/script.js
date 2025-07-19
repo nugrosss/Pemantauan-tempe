@@ -20,9 +20,9 @@ function login() {
   }
 }
 
-function logout() {
+function history() {
   localStorage.removeItem("loggedIn");
-  window.location.href = "/";
+  window.location.href = "/history";
 }
 
 

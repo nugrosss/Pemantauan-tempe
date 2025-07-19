@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Riwayat Gambar Tempe</title>
+</head>
+<body>
+    <h1>Riwayat Foto Tempe</h1>
+    {% for img in images %}
+        <div style="margin-bottom: 20px;">
+            <img src="{{ url_for('static', filename=img.split('static/')[1]) }}" width="400" />
+            <p>{{ img.split('/')[-1] }}</p> <!-- Menampilkan nama file (timestamp) -->
+        </div>
+    {% endfor %}
+</body>
+</html>

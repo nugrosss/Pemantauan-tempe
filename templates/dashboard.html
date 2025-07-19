@@ -24,7 +24,7 @@
         <p>Kelembaban: <span id="kelembaban">{{ data.kelembaban }}</span> %</p>
       </div>
       <div class="box">
-        <button onclick="logout()">Logout</button>
+        <button onclick="history()">History</button>
       </div>
     </div>
 
@@ -37,12 +37,16 @@
       <!-- <h2>Gambar Deteksi (Setiap 10 Detik)</h2>
 <img id="deteksi" src="/image_feed" width="640" height="480" alt="Deteksi Kamera" /> -->
 
-        <h2>Tempe Bagus</h2>
-        <!-- <img id="imgBagus" src="/tempe_bagus" width="640" height="480" alt="Tempe Bagus" /> -->
-        <img id="imgBagus" src="{{ url_for('static', filename='tempe_bagus.jpg') }}">
-        <h2>Tempe Gagal</h2>
-        <!-- <img id="imgJelek" src="/tempe_jelek" width="640" height="480" alt="Tempe Gagal" /> -->
-        <img id="imgJelek" src="{{ url_for('static', filename='tempe_jelek.jpg') }}">
+        <div style="text-align: center; margin-bottom: 20px;">
+           <h2>Tempe Bagus</h2>
+           <img id="imgBagus" src="{{ url_for('static', filename='tempe_bagus.jpg') }}" width="640" height="480" alt="Tempe Bagus" />
+          </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2>Tempe Gagal</h2>
+            <img id="imgJelek" src="{{ url_for('static', filename='tempe_jelek.jpg') }}" width="640" height="480" alt="Tempe Gagal" />
+        </div>
+
     </div>
   </div>
 
