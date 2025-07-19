@@ -99,3 +99,14 @@ body {
   border-color: #dc3545;
   color: #dc3545;
 }
+/* Header */
+.header {
+  background-color: #4CAF50; /* Hijau, bisa diganti */
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-bottom: 4px solid #388E3C;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}

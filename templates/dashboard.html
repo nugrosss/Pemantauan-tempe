@@ -8,8 +8,12 @@
   <meta http-equiv="Expires" content="0"> 
   <title>Dashboard Tempe</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- <link rel="stylesheet" href="style.css"> -->
 </head>
 <body>
+   <header class="header">
+    <h1>Dashboard Pemantauan Tempe</h1>
+  </header>
 
   <div class="dashboard-container">
     <div class="sidebar">
@@ -27,17 +31,15 @@
     <div class="main-content">
       <!-- <h1>Hasil Deteksi</h1>
       <img id="deteksi" src="/latest_image" width="640" alt="Deteksi Kamera" style="border:1px solid #ccc; border-radius: 8px;"> -->
-      <h1>Live Deteksi Tempe</h1>
+    
       <img src="{{ url_for('video_feed') }}" width="640" height="480" />
 
-        <div class="box">
-          <p>Jumlah Tempe Bagus: <span id="bagus">0</span></p>
-          <p>Jumlah Tempe Jelek: <span id="jelek">0</span></p>
-        </div>
+        
 
     </div>
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <!-- <script src="script.js"></script> -->
 </body>
 </html>
