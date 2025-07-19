@@ -38,20 +38,15 @@
 <img id="deteksi" src="/image_feed" width="640" height="480" alt="Deteksi Kamera" /> -->
 
         <h2>Tempe Bagus</h2>
-        <img id="imgBagus" src="/tempe_bagus" width="640" height="480" alt="Tempe Bagus" />
-
+        <!-- <img id="imgBagus" src="/tempe_bagus" width="640" height="480" alt="Tempe Bagus" /> -->
+        <img id="imgBagus" src="{{ url_for('static', filename='tempe_bagus.jpg') }}">
         <h2>Tempe Gagal</h2>
-        <img id="imgJelek" src="/tempe_jelek" width="640" height="480" alt="Tempe Gagal" />
-
+        <!-- <img id="imgJelek" src="/tempe_jelek" width="640" height="480" alt="Tempe Gagal" /> -->
+        <img id="imgJelek" src="{{ url_for('static', filename='tempe_jelek.jpg') }}">
     </div>
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}">
-    setInterval(() => {
-    document.getElementById("imgBagus").src = "/tempe_bagus?" + new Date().getTime();
-    document.getElementById("imgJelek").src = "/tempe_jelek?" + new Date().getTime();
-  }, 10000);
-; 
   </script>
   <!-- <script src="script.js"></script> -->
 </body>

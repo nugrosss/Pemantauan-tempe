@@ -54,6 +54,24 @@ function updateTempeCount() {
     .catch(error => console.error('Gagal ambil data tempe:', error));
 }
 
+  function resetImages() {
+    document.getElementById("imgBagus").src = "";
+    document.getElementById("imgJelek").src = "";
+  }
+
+  function updateImages() {
+    document.getElementById("imgBagus").src = "/tempe_bagus?" + new Date().getTime();
+    document.getElementById("imgJelek").src = "/tempe_jelek?" + new Date().getTime();
+  }
+
+  // Reset setiap 3 detik
+  // setInterval(resetImages, 3000);
+
+  // Update gambar setiap 10 detik
+  setInterval(updateImages, 3000);
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
   updateSensorData();
   setInterval(updateSensorData, 1000);

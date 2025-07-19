@@ -5,7 +5,7 @@ import time
 import os
 
 app = Flask(__name__)
-model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
+model = YOLO("/home/pi/nabila nadia/progam baru /best (1).pt")
 
 data_sensor = {
     "suhu": 0,
@@ -33,37 +33,38 @@ def process_single_frame():
         print("❌ Gagal membaca kamera")
         return
 
+    # Deteksi YOLO
     results = model.predict(frame, verbose=False)
+    boxes = results[0].boxes
+    names = model.names
 
+    # Inisialisasi frame hasil
+    frame_with_box = frame.copy()
+
+    # Reset jumlah tempe
     tempe_count["Tempe bagus"] = 0
     tempe_count["Tempe jelek"] = 0
 
-    frame_bagus = frame.copy()
-    frame_jelek = frame.copy()
+    for box in boxes:
+        cls_id = int(box.cls[0])
+        label = names[cls_id].lower()
+        conf = float(box.conf[0])
+        x1, y1, x2, y2 = map(int, box.xyxy[0])
 
-    for r in results:
-        for box in r.boxes:
-            cls_id = int(box.cls[0])
-            label = model.names[cls_id].lower()
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            conf = box.conf[0]
-            warna = (0, 255, 0) if "bagus" in label else (0, 0, 255)
+        warna = (0, 255, 0) if "bagus" in label else (0, 0, 255)
+        cv2.rectangle(frame_with_box, (x1, y1), (x2, y2), warna, 2)
+        cv2.putText(frame_with_box, f"{label} {conf:.2f}", (x1, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, warna, 2)
 
-            if "tempe bagus" in label:
-                tempe_count["Tempe bagus"] += 1
-                cv2.rectangle(frame_bagus, (x1, y1), (x2, y2), warna, 2)
-                cv2.putText(frame_bagus, f'{label} {conf:.2f}', (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, warna, 2)
+        if "bagus" in label:
+            tempe_count["Tempe bagus"] += 1
+        elif "jelek" in label:
+            tempe_count["Tempe jelek"] += 1
 
-            elif "tempe jelek" in label:
-                tempe_count["Tempe jelek"] += 1
-                cv2.rectangle(frame_jelek, (x1, y1), (x2, y2), warna, 2)
-                cv2.putText(frame_jelek, f'{label} {conf:.2f}', (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, warna, 2)
+    # Simpan 1 gambar hasil (dengan box)
+    cv2.imwrite("static/tempe_bagus.jpg", frame_with_box)
+    cv2.imwrite("static/tempe_jelek.jpg", frame_with_box)
 
-    # Simpan hasil terpisah
-    cv2.imwrite("static/tempe_bagus.jpg", frame_bagus)
-    cv2.imwrite("static/tempe_jelek.jpg", frame_jelek)
 
 
 @app.route('/image_feed')
