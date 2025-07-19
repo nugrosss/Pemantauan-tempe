@@ -75,7 +75,7 @@ def image_feed():
         last_capture_time = current_time
     return send_file(last_frame_path, mimetype='image/jpeg')
 
-
+#tempe
 @app.route('/tempe_bagus')
 def tempe_bagus():
     global last_capture_time
