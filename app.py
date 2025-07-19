@@ -24,7 +24,7 @@ def process_single_frame():
     global tempe_count
 
     cap = cv2.VideoCapture(0)
-    time.sleep(2)  # waktu inisialisasi kamera
+    time.sleep(2)
 
     success, frame = cap.read()
     cap.release()
@@ -38,23 +38,33 @@ def process_single_frame():
     tempe_count["Tempe bagus"] = 0
     tempe_count["Tempe jelek"] = 0
 
+    frame_bagus = frame.copy()
+    frame_jelek = frame.copy()
+
     for r in results:
         for box in r.boxes:
             cls_id = int(box.cls[0])
             label = model.names[cls_id].lower()
+            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            conf = box.conf[0]
+            warna = (0, 255, 0) if "bagus" in label else (0, 0, 255)
 
             if "tempe bagus" in label:
                 tempe_count["Tempe bagus"] += 1
+                cv2.rectangle(frame_bagus, (x1, y1), (x2, y2), warna, 2)
+                cv2.putText(frame_bagus, f'{label} {conf:.2f}', (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, warna, 2)
+
             elif "tempe jelek" in label:
                 tempe_count["Tempe jelek"] += 1
+                cv2.rectangle(frame_jelek, (x1, y1), (x2, y2), warna, 2)
+                cv2.putText(frame_jelek, f'{label} {conf:.2f}', (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, warna, 2)
 
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            conf = box.conf[0]
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    # Simpan hasil terpisah
+    cv2.imwrite("static/tempe_bagus.jpg", frame_bagus)
+    cv2.imwrite("static/tempe_jelek.jpg", frame_jelek)
 
-    cv2.imwrite(last_frame_path, frame)
 
 @app.route('/image_feed')
 def image_feed():
@@ -64,6 +74,24 @@ def image_feed():
         process_single_frame()
         last_capture_time = current_time
     return send_file(last_frame_path, mimetype='image/jpeg')
+
+
+@app.route('/tempe_bagus')
+def tempe_bagus():
+    global last_capture_time
+    if time.time() - last_capture_time >= 10:
+        process_single_frame()
+        last_capture_time = time.time()
+    return send_file("static/tempe_bagus.jpg", mimetype='image/jpeg')
+
+@app.route('/tempe_jelek')
+def tempe_jelek():
+    global last_capture_time
+    if time.time() - last_capture_time >= 10:
+        process_single_frame()
+        last_capture_time = time.time()
+    return send_file("static/tempe_jelek.jpg", mimetype='image/jpeg')
+
 
 @app.route('/')
 def home():

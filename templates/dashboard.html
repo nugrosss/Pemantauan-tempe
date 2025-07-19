@@ -34,19 +34,24 @@
     
       <!-- <img src="{{ url_for('video_feed') }}" width="640" height="480" /> -->
 
-      <h2>Gambar Deteksi (Setiap 10 Detik)</h2>
-<img id="deteksi" src="/image_feed" width="640" height="480" alt="Deteksi Kamera" />
+      <!-- <h2>Gambar Deteksi (Setiap 10 Detik)</h2>
+<img id="deteksi" src="/image_feed" width="640" height="480" alt="Deteksi Kamera" /> -->
 
-        
+        <h2>Tempe Bagus</h2>
+        <img id="imgBagus" src="/tempe_bagus" width="640" height="480" alt="Tempe Bagus" />
+
+        <h2>Tempe Gagal</h2>
+        <img id="imgJelek" src="/tempe_jelek" width="640" height="480" alt="Tempe Gagal" />
 
     </div>
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}">
-     setInterval(() => {
-    const img = document.getElementById("deteksi");
-    img.src = "/image_feed?" + new Date().getTime();  // Bypass cache
-  }, 10000); 
+    setInterval(() => {
+    document.getElementById("imgBagus").src = "/tempe_bagus?" + new Date().getTime();
+    document.getElementById("imgJelek").src = "/tempe_jelek?" + new Date().getTime();
+  }, 10000);
+; 
   </script>
   <!-- <script src="script.js"></script> -->
 </body>
