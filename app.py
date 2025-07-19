@@ -21,14 +21,15 @@ model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
 def generate_frames():
     global tempe_count
     while True:
+        time.sleep(1)  # Ambil frame setiap 1 detik
+
         success, frame = cap.read()
         if not success:
             print("❌ Gagal membaca kamera")
-            break
+            continue
 
         results = model.predict(frame, verbose=False)
 
-        # Reset jumlah tempe
         tempe_count["Tempe bagus"] = 0
         tempe_count["Tempe jelek"] = 0
 
@@ -37,9 +38,9 @@ def generate_frames():
                 cls_id = int(box.cls[0])
                 label = model.names[cls_id].lower()
 
-                if "Tempe bagus" in label:
+                if "tempe bagus" in label:
                     tempe_count["Tempe bagus"] += 1
-                elif "Tempe jelek" in label:
+                elif "tempe jelek" in label:
                     tempe_count["Tempe jelek"] += 1
 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
@@ -52,7 +53,6 @@ def generate_frames():
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
 
-        # Streaming ke browser
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
