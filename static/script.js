@@ -25,6 +25,7 @@ function logout() {
   window.location.href = "/";
 }
 
+
 function updateSensorData() {
   fetch('/sensor-data')
     .then(response => response.json())

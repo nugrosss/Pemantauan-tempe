@@ -1,9 +1,11 @@
-from flask import Flask, render_template, Response, jsonify, request
+from flask import Flask, render_template, Response, jsonify, request, send_file
 import cv2
 from ultralytics import YOLO
 import time
+import os
 
 app = Flask(__name__)
+model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
 
 data_sensor = {
     "suhu": 0,
@@ -15,46 +17,53 @@ tempe_count = {
     "Tempe jelek": 0
 }
 
-cap = cv2.VideoCapture(0)
-model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best.pt")
+last_capture_time = 0
+last_frame_path = "static/last_result.jpg"
 
-def generate_frames():
+def process_single_frame():
     global tempe_count
-    while True:
-        time.sleep(1)  # Ambil frame setiap 1 detik
 
-        success, frame = cap.read()
-        if not success:
-            print("❌ Gagal membaca kamera")
-            continue
+    cap = cv2.VideoCapture(0)
+    time.sleep(2)  # waktu inisialisasi kamera
 
-        results = model.predict(frame, verbose=False)
+    success, frame = cap.read()
+    cap.release()
 
-        tempe_count["Tempe bagus"] = 0
-        tempe_count["Tempe jelek"] = 0
+    if not success:
+        print("❌ Gagal membaca kamera")
+        return
 
-        for r in results:
-            for box in r.boxes:
-                cls_id = int(box.cls[0])
-                label = model.names[cls_id].lower()
+    results = model.predict(frame, verbose=False)
 
-                if "tempe bagus" in label:
-                    tempe_count["Tempe bagus"] += 1
-                elif "tempe jelek" in label:
-                    tempe_count["Tempe jelek"] += 1
+    tempe_count["Tempe bagus"] = 0
+    tempe_count["Tempe jelek"] = 0
 
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                conf = box.conf[0]
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    for r in results:
+        for box in r.boxes:
+            cls_id = int(box.cls[0])
+            label = model.names[cls_id].lower()
 
-        # Encode ke JPEG
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
+            if "tempe bagus" in label:
+                tempe_count["Tempe bagus"] += 1
+            elif "tempe jelek" in label:
+                tempe_count["Tempe jelek"] += 1
 
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            conf = box.conf[0]
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+    cv2.imwrite(last_frame_path, frame)
+
+@app.route('/image_feed')
+def image_feed():
+    global last_capture_time
+    current_time = time.time()
+    if current_time - last_capture_time >= 10:
+        process_single_frame()
+        last_capture_time = current_time
+    return send_file(last_frame_path, mimetype='image/jpeg')
 
 @app.route('/')
 def home():

@@ -32,14 +32,22 @@
       <!-- <h1>Hasil Deteksi</h1>
       <img id="deteksi" src="/latest_image" width="640" alt="Deteksi Kamera" style="border:1px solid #ccc; border-radius: 8px;"> -->
     
-      <img src="{{ url_for('video_feed') }}" width="640" height="480" />
+      <!-- <img src="{{ url_for('video_feed') }}" width="640" height="480" /> -->
+
+      <h2>Gambar Deteksi (Setiap 10 Detik)</h2>
+<img id="deteksi" src="/image_feed" width="640" height="480" alt="Deteksi Kamera" />
 
         
 
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}">
+     setInterval(() => {
+    const img = document.getElementById("deteksi");
+    img.src = "/image_feed?" + new Date().getTime();  // Bypass cache
+  }, 10000); 
+  </script>
   <!-- <script src="script.js"></script> -->
 </body>
 </html>
