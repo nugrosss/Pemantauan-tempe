@@ -4,7 +4,11 @@ from ultralytics import YOLO
 import time
 import os
 import datetime
+from gpiozero import Buzzer
 
+
+
+buzzer = Buzzer(3)
 app = Flask(__name__)
 model = YOLO("/home/pi/nabila nadia/progam baru /best (1).pt")
 
@@ -144,4 +148,9 @@ def update_data():
     return "Data tidak lengkap"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+
+    print("server on")
+    buzzer.on()
+    time.sleep(1)
+    buzzer.off()
+    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=False)
