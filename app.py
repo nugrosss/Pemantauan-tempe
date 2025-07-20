@@ -3,6 +3,7 @@ import cv2
 from ultralytics import YOLO
 import time
 import os
+import datetime
 
 app = Flask(__name__)
 model = YOLO("/home/pi/nabila nadia/progam baru /best (1).pt")
@@ -64,6 +65,11 @@ def process_single_frame():
     # Simpan 1 gambar hasil (dengan box)
     cv2.imwrite("static/tempe_bagus.jpg", frame_with_box)
     cv2.imwrite("static/tempe_jelek.jpg", frame_with_box)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"static/history/tempe_{timestamp}.jpg"
+    cv2.imwrite(filename, frame_with_box)
+    print(f"✅ Disimpan ke history: {filename}")
 
 
 
