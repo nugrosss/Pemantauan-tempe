@@ -3,14 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Riwayat Gambar Tempe</title>
+    <linkrel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></linkrel>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card p {
+            text-align: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        hr {
+            margin: 40px 0;
+        }
+        .header {
+            background-color: #4CAF50; /* Hijau, bisa diganti */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-bottom: 4px solid #388E3C;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+    </style>
 </head>
 <body>
-    <h1>Riwayat Foto Tempe</h1>
-    {% for img in images %}
-        <div style="margin-bottom: 20px;">
-            <img src="{{ url_for('static', filename=img.split('static/')[1]) }}" width="400" />
-            <p>{{ img.split('/')[-1] }}</p> <!-- Menampilkan nama file (timestamp) -->
-        </div>
-    {% endfor %}
+    <header class="header" style="position: relative; height: 60px;">
+      <img src="{{ url_for('static', filename='1753185805088.png') }}" alt="Logo" style="height: 50px; position: absolute; left: 50px; top: 20px;">
+      <h1 style="text-align: center; margin: 0; line-height: 60px;">Dashboard Pemantauan Tempe</h1>
+   </header>
+
+    <!-- <h1>Riwayat Foto Tempe</h1> -->
+
+    <h2>Tempe Bagus</h2>
+    <div class="gallery">
+        {% for img in bagus %}
+            <div class="card">
+                <img src="{{ url_for('static', filename='simpan/' + img) }}" alt="{{ img }}">
+                <p>{{ img }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2>Tempe Jelek</h2>
+    <div class="gallery">
+        {% for img in jelek %}
+            <div class="card">
+                <img src="{{ url_for('static', filename='simpan/' + img) }}" alt="{{ img }}">
+                <p>{{ img }}</p>
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>

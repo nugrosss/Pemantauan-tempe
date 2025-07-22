@@ -11,9 +11,12 @@
   <!-- <link rel="stylesheet" href="style.css"> -->
 </head>
 <body>
-   <header class="header">
-    <h1>Dashboard Pemantauan Tempe</h1>
-  </header>
+   <header class="header" style="position: relative; height: 60px;">
+      <img src="{{ url_for('static', filename='1753185805088.png') }}" alt="Logo" style="height: 50px; position: absolute; left: 50px; top: 20px;">
+      <h1 style="text-align: center; margin: 0; line-height: 60px;">Dashboard Pemantauan Tempe</h1>
+   </header>
+
+
 
   <div class="dashboard-container">
     <div class="sidebar">
@@ -28,15 +31,7 @@
       </div>
     </div>
 
-    <div class="main-content">
-      <!-- <h1>Hasil Deteksi</h1>
-      <img id="deteksi" src="/latest_image" width="640" alt="Deteksi Kamera" style="border:1px solid #ccc; border-radius: 8px;"> -->
-    
-      <!-- <img src="{{ url_for('video_feed') }}" width="640" height="480" /> -->
-
-      <!-- <h2>Gambar Deteksi (Setiap 10 Detik)</h2>
-<img id="deteksi" src="/image_feed" width="640" height="480" alt="Deteksi Kamera" /> -->
-        
+    <!-- <div class="main-content">    
         <div style="text-align: center; margin-bottom: 20px;">
             <h2>Tempe Bagus</h2>
             <img id="imgBagus" src="{{ url_for('static', filename='tempe_bagus.jpg') }}" width="320" height="240" alt="Tempe Bagus" />
@@ -48,7 +43,21 @@
         </div>
 
 
+    </div> -->
+    <div class="main-content">
+
+    <div style="text-align: center; margin-bottom: 20px; background-color: #e0ffe0; border: 2px solid #2ecc71; padding: 10px; border-radius: 10px;">
+        <h2 style="color: #2ecc71;">Tempe Bagus</h2>
+        <img id="imgBagus1" src="{{ url_for('static', filename='tempe_bagus.jpg') }}" width="320" height="240" alt="Tempe Bagus" style="border: 4px solid #2ecc71; border-radius: 10px;" />
     </div>
+
+    <div style="text-align: center; margin-bottom: 20px; background-color: #ffe0e0; border: 2px solid #e74c3c; padding: 10px; border-radius: 10px;">
+        <h2 style="color: #e74c3c;">Tempe Gagal</h2>
+        <img id="imgJelek1" src="{{ url_for('static', filename='tempe_jelek.jpg') }}" width="320" height="240" alt="Tempe Gagal" style="border: 4px solid #e74c3c; border-radius: 10px;" />
+    </div>
+
+</div>
+
   </div>
 
   <script src="{{ url_for('static', filename='script.js') }}">

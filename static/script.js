@@ -59,10 +59,18 @@ function updateTempeCount() {
     document.getElementById("imgJelek").src = "";
   }
 
-  function updateImages() {
-    document.getElementById("imgBagus").src = "/tempe_bagus?" + new Date().getTime();
-    document.getElementById("imgJelek").src = "/tempe_jelek?" + new Date().getTime();
-  }
+function updateImages() {
+  const timestamp = new Date().getTime();
+  document.getElementById("imgBagus").src = `/static/tempe_bagus.jpg?t=${timestamp}`;
+  document.getElementById("imgJelek").src = `/static/tempe_jelek.jpg?t=${timestamp}`;
+}
+
+function updateImagesDasboar() {
+  const timestamp = new Date().getTime();
+  document.getElementById("imgBagus1").src = `/static/tempe_bagus.jpg?t=${timestamp}`;
+  document.getElementById("imgJelek1").src = `/static/tempe_jelek.jpg?t=${timestamp}`;
+}
+
 
   // Reset setiap 3 detik
   // setInterval(resetImages, 3000);
@@ -81,4 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateTempeCount();
   setInterval(updateTempeCount, 1000);  // ← Tambahkan baris ini
+
+  updateImagesDasboar()
+  setInterval(updateImagesDasboar, 1000);
 });

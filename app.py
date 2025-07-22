@@ -1,16 +1,15 @@
-from flask import Flask, render_template, Response, jsonify, request, send_file
+from flask import Flask, render_template, Response, jsonify, request, send_from_directory
 import cv2
 from ultralytics import YOLO
 import time
 import os
 import datetime
-from gpiozero import Buzzer
+import threading
+# from gpiozero import Buzzer
 
-
-
-buzzer = Buzzer(3)
+# buzzer = Buzzer(3)
 app = Flask(__name__)
-model = YOLO("/home/pi/nabila nadia/progam baru /best (1).pt")
+model = YOLO("D:/joki/bila&nadia/web/best (2).pt")
 
 data_sensor = {
     "suhu": 0,
@@ -66,47 +65,40 @@ def process_single_frame():
         elif "jelek" in label:
             tempe_count["Tempe jelek"] += 1
 
-    # Simpan 1 gambar hasil (dengan box)
-    cv2.imwrite("static/tempe_bagus.jpg", frame_with_box)
-    cv2.imwrite("static/tempe_jelek.jpg", frame_with_box)
+    # Simpan gambar setelah semua box diproses
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    jenis_tempe = "tempe_jelek" if tempe_count["Tempe jelek"] > 0 else "tempe_bagus"
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"static/history/tempe_{timestamp}.jpg"
-    cv2.imwrite(filename, frame_with_box)
-    print(f"✅ Disimpan ke history: {filename}")
+    # Simpan ke folder `static/simpan/` dengan timestamp
+    filename_simpan = f"D:/joki/bila&nadia/web/static/simpan/{jenis_tempe}_{timestamp}.jpg"
+    cv2.imwrite(filename_simpan, frame_with_box)
+    print(f"✅ Gambar disimpan: {filename_simpan}")
 
+    # Simpan juga versi tanpa timestamp di `static/`
+    filename_static = f"D:/joki/bila&nadia/web/static/{jenis_tempe}.jpg"
+    cv2.imwrite(filename_static, frame_with_box)
+    print(f"✅ Gambar disimpan: {filename_static}")
 
-
-@app.route('/image_feed')
-def image_feed():
+    
+def loop_detect_tempe():
     global last_capture_time
-    current_time = time.time()
-    if current_time - last_capture_time >= 10:
+    while True:
         process_single_frame()
-        last_capture_time = current_time
-    return send_file(last_frame_path, mimetype='image/jpeg')
+        last_capture_time = time.time()
+        time.sleep(5)
+
+
+@app.route('/tempe_bagus')
+def serve_tempe_bagus():
+    return send_from_directory('static', 'tempe_bagus.jpg')
+
+@app.route('/tempe_jelek')
+def serve_tempe_jelek():
+    return send_from_directory('static', 'tempe_jelek.jpg')
 
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-#tempe
-@app.route('/tempe_bagus')
-def tempe_bagus():
-    global last_capture_time
-    if time.time() - last_capture_time >= 10:
-        process_single_frame()
-        last_capture_time = time.time()
-    return send_file("static/tempe_bagus.jpg", mimetype='image/jpeg')
-
-@app.route('/tempe_jelek')
-def tempe_jelek():
-    global last_capture_time
-    if time.time() - last_capture_time >= 10:
-        process_single_frame()
-        last_capture_time = time.time()
-    return send_file("static/tempe_jelek.jpg", mimetype='image/jpeg')
 
 
 @app.route('/')
@@ -119,12 +111,22 @@ def dashboard():
 
 @app.route('/history')
 def history():
-    image_folder = 'static/history'
-    images = []
+    image_folder = 'D:/joki/bila&nadia/web/static/simpan'
+    bagus = []
+    jelek = []
+
     if os.path.exists(image_folder):
-        images = os.listdir(image_folder)
-        images.sort(reverse=True)  # Supaya terbaru tampil dulu
-    return render_template('history.html', images=images)
+        all_images = os.listdir(image_folder)
+        all_images.sort(reverse=True)  # Supaya yang terbaru muncul dulu
+
+        # Pisahkan gambar berdasarkan nama file
+        for img in all_images:
+            if 'bagus' in img.lower():
+                bagus.append(img)
+            elif 'jelek' in img.lower():
+                jelek.append(img)
+
+    return render_template('history.html', bagus=bagus, jelek=jelek)
 
 
 @app.route('/sensor-data')
@@ -150,7 +152,10 @@ def update_data():
 if __name__ == '__main__':
 
     print("server on")
-    buzzer.on()
-    time.sleep(1)
-    buzzer.off()
+    # buzzer.on()
+    # time.sleep(1)
+    # buzzer.off()
+    t = threading.Thread(target=loop_detect_tempe)
+    t.daemon = True  # agar thread berhenti saat Flask dimatikan
+    t.start()
     app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=False)
