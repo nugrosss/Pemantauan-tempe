@@ -5,11 +5,11 @@ import time
 import os
 import datetime
 import threading
-# from gpiozero import Buzzer
+from gpiozero import Buzzer
 
-# buzzer = Buzzer(3)
-app = Flask(__name__)
-model = YOLO("D:/joki/bila&nadia/web/best (2).pt")
+buzzer = Buzzer(3)
+app = Flask(_name_)
+model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best (2).pt")
 
 data_sensor = {
     "suhu": 0,
@@ -57,25 +57,29 @@ def process_single_frame():
 
         warna = (0, 255, 0) if "bagus" in label else (0, 0, 255)
         cv2.rectangle(frame_with_box, (x1, y1), (x2, y2), warna, 2)
-        cv2.putText(frame_with_box, f"{label} {conf:.2f}", (x1, y1 - 10),
+        cv2.putText(frame_with_box, f"{label} {conf*100:.2f}%", (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, warna, 2)
 
         if "bagus" in label:
             tempe_count["Tempe bagus"] += 1
         elif "jelek" in label:
             tempe_count["Tempe jelek"] += 1
+            print("server on")
+            buzzer.on()
+            time.sleep(1)
+            buzzer.off()
 
     # Simpan gambar setelah semua box diproses
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     jenis_tempe = "tempe_jelek" if tempe_count["Tempe jelek"] > 0 else "tempe_bagus"
 
-    # Simpan ke folder `static/simpan/` dengan timestamp
-    filename_simpan = f"D:/joki/bila&nadia/web/static/simpan/{jenis_tempe}_{timestamp}.jpg"
+    # Simpan ke folder static/simpan/ dengan timestamp
+    filename_simpan = f"/home/pi/nabila nadia/progam baru /Pemantauan-tempe/static/simpan/{jenis_tempe}_{timestamp}.jpg"
     cv2.imwrite(filename_simpan, frame_with_box)
     print(f"✅ Gambar disimpan: {filename_simpan}")
 
-    # Simpan juga versi tanpa timestamp di `static/`
-    filename_static = f"D:/joki/bila&nadia/web/static/{jenis_tempe}.jpg"
+    # Simpan juga versi tanpa timestamp di static/
+    filename_static = f"/home/pi/nabila nadia/progam baru /Pemantauan-tempe/static/{jenis_tempe}.jpg"
     cv2.imwrite(filename_static, frame_with_box)
     print(f"✅ Gambar disimpan: {filename_static}")
 
@@ -87,6 +91,12 @@ def loop_detect_tempe():
         last_capture_time = time.time()
         time.sleep(5)
 
+ 
+def get_file_time(path):
+    if os.path.exists(path):
+        timestamp = os.path.getmtime(path)
+        return datetime.datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+    return "Tidak tersedia"
 
 @app.route('/tempe_bagus')
 def serve_tempe_bagus():
@@ -107,11 +117,15 @@ def home():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', data=data_sensor)
-
+    waktu_bagus = get_file_time("static/tempe_bagus.jpg")
+    waktu_jelek = get_file_time("static/tempe_jelek.jpg")
+    return render_template('dashboard.html',
+                           data=data_sensor,
+                           waktu_bagus=waktu_bagus,
+                           waktu_jelek=waktu_jelek)
 @app.route('/history')
 def history():
-    image_folder = 'D:/joki/bila&nadia/web/static/simpan'
+    image_folder = '/home/pi/nabila nadia/progam baru /Pemantauan-tempe/static/simpan'
     bagus = []
     jelek = []
 
@@ -133,6 +147,8 @@ def history():
 def sensor_data():
     return jsonify(data_sensor)
 
+
+
 @app.route('/tempe-count')
 def get_tempe_count():
     return jsonify(tempe_count)
@@ -149,12 +165,12 @@ def update_data():
         return "Data diterima"
     return "Data tidak lengkap"
 
-if __name__ == '__main__':
+if _name_ == '_main_':
 
     print("server on")
-    # buzzer.on()
-    # time.sleep(1)
-    # buzzer.off()
+    buzzer.on()
+    time.sleep(1)
+    buzzer.off()
     t = threading.Thread(target=loop_detect_tempe)
     t.daemon = True  # agar thread berhenti saat Flask dimatikan
     t.start()
