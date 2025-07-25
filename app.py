@@ -6,6 +6,7 @@ import os
 import datetime
 import threading
 # from gpiozero import Buzzer
+#cobaflask
 
 # buzzer = Buzzer(3)
 app = Flask(__name__)
@@ -165,7 +166,7 @@ def update_data():
         return "Data diterima"
     return "Data tidak lengkap"
 
-if __name__ == '_main_':
+if __name__ == '__main__':
 
     print("server on")
     # buzzer.on()
