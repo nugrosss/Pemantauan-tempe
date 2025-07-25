@@ -5,11 +5,11 @@ import time
 import os
 import datetime
 import threading
-from gpiozero import Buzzer
+# from gpiozero import Buzzer
 
-buzzer = Buzzer(3)
-app = Flask(_name_)
-model = YOLO("/home/pi/nabila nadia/progam baru /Pemantauan-tempe/best (2).pt")
+# buzzer = Buzzer(3)
+app = Flask(__name__)
+model = YOLO("D:/joki/bila&nadia/web/best (2).pt")
 
 data_sensor = {
     "suhu": 0,
@@ -65,21 +65,21 @@ def process_single_frame():
         elif "jelek" in label:
             tempe_count["Tempe jelek"] += 1
             print("server on")
-            buzzer.on()
+            # buzzer.on()
             time.sleep(1)
-            buzzer.off()
+            # buzzer.off()
 
     # Simpan gambar setelah semua box diproses
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     jenis_tempe = "tempe_jelek" if tempe_count["Tempe jelek"] > 0 else "tempe_bagus"
 
     # Simpan ke folder static/simpan/ dengan timestamp
-    filename_simpan = f"/home/pi/nabila nadia/progam baru /Pemantauan-tempe/static/simpan/{jenis_tempe}_{timestamp}.jpg"
+    filename_simpan = f"D:/joki/bila&nadia/web/static/simpan/{jenis_tempe}_{timestamp}.jpg"
     cv2.imwrite(filename_simpan, frame_with_box)
     print(f"✅ Gambar disimpan: {filename_simpan}")
 
     # Simpan juga versi tanpa timestamp di static/
-    filename_static = f"/home/pi/nabila nadia/progam baru /Pemantauan-tempe/static/{jenis_tempe}.jpg"
+    filename_static = f"D:/joki/bila&nadia/web/static/{jenis_tempe}.jpg"
     cv2.imwrite(filename_static, frame_with_box)
     print(f"✅ Gambar disimpan: {filename_static}")
 
@@ -125,7 +125,7 @@ def dashboard():
                            waktu_jelek=waktu_jelek)
 @app.route('/history')
 def history():
-    image_folder = '/home/pi/nabila nadia/progam baru /Pemantauan-tempe/static/simpan'
+    image_folder = 'D:/joki/bila&nadia/web/static/simpan'
     bagus = []
     jelek = []
 
@@ -165,12 +165,12 @@ def update_data():
         return "Data diterima"
     return "Data tidak lengkap"
 
-if _name_ == '_main_':
+if __name__ == '_main_':
 
     print("server on")
-    buzzer.on()
-    time.sleep(1)
-    buzzer.off()
+    # buzzer.on()
+    # time.sleep(1)
+    # buzzer.off()
     t = threading.Thread(target=loop_detect_tempe)
     t.daemon = True  # agar thread berhenti saat Flask dimatikan
     t.start()
