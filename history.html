@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard History Tempe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-bottom: 4px solid #388E3C;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 60px;
+            }
+
+        .logo {
+            height: 50px;
+            position: absolute;
+            left: 20px;
+            }
+
+        .title {
+            margin: 0;
+            font-size: 24px;
+            text-align: center;
+            width: 100%;
+            }
+
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .folder-info {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #4CAF50;
+        }
+
+        .folder-path {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 5px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .status-online {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .status-offline {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-bagus .stat-number { color: #4CAF50; }
+        .stat-jelek .stat-number { color: #f44336; }
+        .stat-total .stat-number { color: #2196F3; }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title.bagus {
+            background: linear-gradient(135deg, #4CAF50, #81C784);
+            color: white;
+        }
+
+        .section-title.jelek {
+            background: linear-gradient(135deg, #f44336, #e57373);
+            color: white;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .card-info {
+            padding: 15px;
+        }
+
+        .filename {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .classification {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .classification.bagus {
+            background: #4CAF50;
+        }
+
+        .classification.jelek {
+            background: #f44336;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .modal-content {
+            display: block;
+            margin: auto;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 5%;
+            border-radius: 10px;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #ff6b6b;
+        }
+
+        .no-images {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            font-style: italic;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            background: #45a049;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+            
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+   <header class="header">
+    <div class="header-content">
+        <img src="1753185805088.png" alt="Logo" class="logo">
+        <h1 class="title">Dashboard Pemantauan Tempe</h1>
+    </div>
+    </header>
+
+
+    <div class="container">
+        <!-- Folder Info -->
+        <div class="folder-info" id="folderInfo" style="display: none;">
+            <h3>📁 Informasi Folder</h3>
+            <div class="folder-path" id="folderPath">-</div>
+            <div>
+                Status: <span id="folderStatus" class="status-offline">Offline</span>
+                <span style="margin: 0 10px;">|</span>
+                Total: <span id="totalFiles">0 file</span>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats">
+            <div class="stat-card stat-bagus">
+                <div class="stat-number" id="countBagus">0</div>
+                <div class="stat-label">Tempe Bagus</div>
+            </div>
+            <div class="stat-card stat-jelek">
+                <div class="stat-number" id="countJelek">0</div>
+                <div class="stat-label">Tempe Jelek</div>
+            </div>
+            <div class="stat-card stat-total">
+                <div class="stat-number" id="countTotal">0</div>
+                <div class="stat-label">Total Gambar</div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error" style="display: none;"></div>
+
+        <!-- Tempe Bagus Section -->
+        <div class="section">
+            <div class="section-title bagus">
+                🟢 Tempe Berkualitas Bagus (<span id="titleCountBagus">0</span>)
+            </div>
+            <div class="gallery" id="galleryBagus">
+                <div class="loading">🔄 Memuat data...</div>
+            </div>
+        </div>
+
+        <!-- Tempe Jelek Section -->
+        <div class="section">
+            <div class="section-title jelek">
+                🔴 Tempe Berkualitas Jelek (<span id="titleCountJelek">0</span>)
+            </div>
+            <div class="gallery" id="galleryJelek">
+                <div class="loading">🔄 Memuat data...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk gambar besar -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <!-- Ganti menjadi tombol hapus -->
+    <button class="refresh-btn" onclick="hapusSemuaGambar()" title="Hapus Semua Gambar">🗑️</button>
+
+    <script>
+        // Sample data untuk demo (akan diganti dengan data real dari API)
+        // const sampleData = {
+        //     bagus: [
+        //         { filename: 'tempe_bagus_001.jpg', classification: 'bagus', url: '/web/upload_gambar/history/tempe_bagus_001.jpg' },
+        //         { filename: 'tempe_bagus_002.jpg', classification: 'bagus', url: '/web/upload_gambar/history/tempe_bagus_002.jpg' },
+        //         { filename: 'tempe_bagus_003.jpg', classification: 'bagus', url: '/web/upload_gambar/history/tempe_bagus_003.jpg' }
+        //     ],
+        //     jelek: [
+        //         { filename: 'tempe_jelek_001.jpg', classification: 'jelek', url: '/web/upload_gambar/history/tempe_jelek_001.jpg' },
+        //         { filename: 'tempe_jelek_002.jpg', classification: 'jelek', url: '/web/upload_gambar/history/tempe_jelek_002.jpg' }
+        //     ],
+        //     statistics: {
+        //         total: 5,
+        //         bagus_count: 3,
+        //         jelek_count: 2
+        //     },
+        //     folder_info: {
+        //         path: 'C:\\xampp\\htdocs\\web\\upload_gambar\\history',
+        //         exists: true,
+        //         total_files: 5,
+        //         image_files: 5
+        //     }
+        // };
+        async function hapusSemuaGambar() {
+            if (!confirm('Apakah kamu yakin ingin menghapus semua gambar? Tindakan ini tidak dapat dibatalkan.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('api.php?action=hapus_semua', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Semua gambar berhasil dihapus.');
+                    loadData(); // Reload data setelah penghapusan
+                } else {
+                    alert('❌ Gagal menghapus gambar: ' + (result.error || 'Terjadi kesalahan'));
+                }
+            } catch (error) {
+                console.error('Error saat menghapus gambar:', error);
+                alert('❌ Terjadi kesalahan saat menghapus gambar: ' + error.message);
+            }
+        }
+
+        // Load data function
+        async function loadData() {
+            try {
+                showLoading();
+                hideError();
+                
+                // Panggil API untuk mendapatkan data
+                const response = await fetch('api.php?action=get_images');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateUI(data);
+                } else {
+                    // Fallback ke sample data jika API gagal
+                    console.warn('API failed, using sample data:', data.error || 'Unknown error');
+                    showError('Menggunakan data demo - ' + (data.error || 'API tidak tersedia'));
+                    updateUI(sampleData);
+                }
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Fallback ke sample data jika koneksi gagal
+                showError('Gagal terhubung ke server, menggunakan data demo');
+                updateUI(sampleData);
+            }
+        }
+
+        // Update UI with data
+        function updateUI(data) {
+            let bagusCount, jelekCount, totalCount;
+            
+            // Handle API data structure vs sample data
+            if (data.statistics) {
+                // Data dari API
+                bagusCount = data.statistics.bagus_count;
+                jelekCount = data.statistics.jelek_count;
+                totalCount = data.statistics.total;
+                
+                // Update folder info if available
+                // if (data.folder_info) {
+                //     updateFolderInfo(data.folder_info);
+                // }
+            } else {
+                // Sample data fallback
+                bagusCount = data.bagus.length;
+                jelekCount = data.jelek.length;
+                totalCount = bagusCount + jelekCount;
+            }
+
+            // Update statistics
+            document.getElementById('countBagus').textContent = bagusCount;
+            document.getElementById('countJelek').textContent = jelekCount;
+            document.getElementById('countTotal').textContent = totalCount;
+            document.getElementById('titleCountBagus').textContent = bagusCount;
+            document.getElementById('titleCountJelek').textContent = jelekCount;
+
+            // Update galleries
+            updateGallery('galleryBagus', data.bagus || []);
+            updateGallery('galleryJelek', data.jelek || []);
+        }
+
+        // Update folder information
+        // function updateFolderInfo(folderInfo) {
+        //     const folderInfoEl = document.getElementById('folderInfo');
+        //     const folderPathEl = document.getElementById('folderPath');
+        //     const folderStatusEl = document.getElementById('folderStatus');
+        //     const totalFilesEl = document.getElementById('totalFiles');
+            
+        //     folderPathEl.textContent = folderInfo.path || 'C:\\xampp\\htdocs\\web\\upload_gambar\\history';
+        //     totalFilesEl.textContent = `${folderInfo.total_files || 0} file total, ${folderInfo.image_files || 0} gambar`;
+            
+        //     if (folderInfo.exists) {
+        //         folderStatusEl.textContent = '✅ Online';
+        //         folderStatusEl.className = 'status-online';
+        //     } else {
+        //         folderStatusEl.textContent = '❌ Offline (Folder tidak ditemukan)';
+        //         folderStatusEl.className = 'status-offline';
+        //     }
+            
+        //     folderInfoEl.style.display = 'block';
+        // }
+
+        // Update gallery
+        function updateGallery(galleryId, images) {
+            const gallery = document.getElementById(galleryId);
+            
+            if (images.length === 0) {
+                gallery.innerHTML = '<div class="no-images">Tidak ada gambar</div>';
+                return;
+            }
+
+            gallery.innerHTML = images.map(image => {
+                // Handle both API data structure and sample data
+                const filename = image.filename || image.name;
+                const classification = image.classification;
+                const imagePath = image.url || image.path || `upload_gambar/history/${filename}`;
+                const fileSize = image.size_formatted || '';
+                const fileDate = image.date_formatted || '';
+                
+                return `
+                <div class="card">
+                    <img src="${imagePath}" alt="${filename}" 
+                         onclick="openModal('${imagePath}')" 
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZjBmMGYwIi8+Cjx0ZXh0IHg9IjE1MCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE0Ij5HYW1iYXIgVGlkYWsgRGl0ZW11a2FuPC90ZXh0Pgo8L3N2Zz4K'">
+                    <div class="card-info">
+                        <div class="filename">${filename}</div>
+                        <div class="classification ${classification}">${classification.toUpperCase()}</div>
+                        ${fileSize ? `<div style="font-size: 11px; color: #999; margin-top: 5px;">${fileSize} • ${fileDate}</div>` : ''}
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // Modal functions
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = src;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Show/hide functions
+        function showLoading() {
+            document.getElementById('galleryBagus').innerHTML = '<div class="loading">🔄 Memuat data...</div>';
+            document.getElementById('galleryJelek').innerHTML = '<div class="loading">🔄 Memuat data...</div>';
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData(); // pertama kali saat halaman dibuka
+            setInterval(loadData, 2000); // auto-refresh setiap 2000ms (2 detik)
+        });
+
+        
+        // Close modal when clicking on close button or outside image
+        document.querySelector('.close').onclick = closeModal;
+        document.getElementById('imageModal').onclick = function(e) {
+            if (e.target === this) closeModal();
+        };
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                e.preventDefault();
+                loadData();
+            }
+            // Debug shortcut - Ctrl + D untuk test API connection
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                testAPIConnection();
+            }
+        });
+
+        // Test API Connection (untuk debugging)
+        async function testAPIConnection() {
+            try {
+                console.log('Testing API connection...');
+                const response = await fetch('api.php?action=test_connection');
+                const data = await response.json();
+                console.log('API Test Result:', data);
+                
+                if (data.success) {
+                    alert('✅ API Connection: OK\n\n' + 
+                          'PHP Version: ' + data.environment.php_version + '\n' +
+                          'Folder Path: ' + data.environment.full_folder_path + '\n' +
+                          'Folder Exists: ' + (data.environment.folder_exists ? 'Yes' : 'No') + '\n' +
+                          'Folder Readable: ' + (data.environment.folder_readable ? 'Yes' : 'No'));
+                } else {
+                    alert('❌ API Test Failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('API Test Error:', error);
+                alert('❌ Cannot connect to API: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
